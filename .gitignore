@@ -1,0 +1,36 @@
+# Rust
+/target
+/src-tauri/target
+
+# Node / frontend
+node_modules
+dist
+.vite
+
+# Environment & secrets
+.env
+*.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.dmg
+*.deb
+*.msi
+*.AppImage
+*.rpm
+
+# Log files
+*.log
+npm-debug.log*
+
+# Tauri
+src-tauri/WixTools/
