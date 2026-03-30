@@ -9,7 +9,7 @@ Hold a configurable global hotkey → speak → the transcript is injected into 
 
 | Feature | Detail |
 |---|---|
-| 🎙️ Global push-to-talk | Configurable hotkey (default `RightCtrl` on macOS, `F13` elsewhere) |
+| 🎙️ Global push-to-talk | Configurable hotkey (default `F13` on macOS, `RightCtrl` on Windows/Linux) |
 | 🌐 Multi-provider ASR | OpenAI Whisper (HTTP), WebSocket streaming, or built-in Mock |
 | 🤖 LLM post-processing | Optional GPT-compatible refinement to fix ASR errors |
 | ⌨️ Text injection | Clipboard-swap + simulated paste (Cmd+V / Ctrl+V) |

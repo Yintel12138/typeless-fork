@@ -1,10 +1,21 @@
 use crate::config::LlmConfig;
 use anyhow::{Context, Result};
 
-const SYSTEM_PROMPT: &str = "你是语音识别纠错助手。\
+fn system_prompt_for_language(language: &str) -> &'static str {
+    if language.starts_with("zh") || language.starts_with("ja") || language.starts_with("ko") {
+        // CJK: Chinese system prompt
+        "你是语音识别纠错助手。\
 只修复明显的ASR识别错误（同音字、断句错误），\
 绝对不能改写、润色、删减用户说的正确内容。\
-如果没有明显错误，原样返回。";
+如果没有明显错误，原样返回。"
+    } else {
+        // Latin scripts: English system prompt
+        "You are a speech-recognition error-correction assistant. \
+Only fix obvious ASR errors (homophones, mis-segmentation). \
+Never rewrite, embellish, or remove correct content. \
+Return the original text unchanged if there are no obvious errors."
+    }
+}
 
 pub struct LlmRefiner;
 
@@ -13,17 +24,18 @@ impl LlmRefiner {
         Self
     }
 
-    pub async fn refine(&self, text: &str, config: &LlmConfig) -> Result<String> {
+    pub async fn refine(&self, text: &str, config: &LlmConfig, language: &str) -> Result<String> {
         if !config.enabled || config.endpoint.is_empty() {
             return Ok(text.to_string());
         }
 
         let client = reqwest::Client::new();
+        let prompt = system_prompt_for_language(language);
 
         let body = serde_json::json!({
             "model": config.model,
             "messages": [
-                { "role": "system", "content": SYSTEM_PROMPT },
+                { "role": "system", "content": prompt },
                 { "role": "user",   "content": text }
             ],
             "temperature": 0.0,

@@ -15,13 +15,14 @@ fn default_language() -> String {
 }
 
 fn default_hotkey() -> String {
+    // macOS: Fn key maps to F13 in many setups; Windows/Linux: Right Ctrl
     #[cfg(target_os = "macos")]
     {
-        "RightCtrl".to_string()
+        "F13".to_string()
     }
     #[cfg(not(target_os = "macos"))]
     {
-        "F13".to_string()
+        "RightCtrl".to_string()
     }
 }
 

@@ -61,7 +61,7 @@ pub async fn stop_recording(
     app: AppHandle,
     state: State<'_, SharedState>,
 ) -> Result<String, String> {
-    let (samples, sample_rate, speech_config, llm_config) = {
+    let (samples, sample_rate, speech_config, llm_config, app_language) = {
         let mut s = state.lock().unwrap();
         let (samples, rate) = s.recorder.stop_recording();
         let _ = app.emit("recording_stop", ());
@@ -70,6 +70,7 @@ pub async fn stop_recording(
             rate,
             s.settings.speech_api.clone(),
             s.settings.llm.clone(),
+            s.settings.language.clone(),
         )
     };
 
@@ -85,7 +86,7 @@ pub async fn stop_recording(
 
     let refiner = LlmRefiner::new();
     let text = refiner
-        .refine(&raw_text, &llm_config)
+        .refine(&raw_text, &llm_config, &app_language)
         .await
         .unwrap_or(raw_text);
 

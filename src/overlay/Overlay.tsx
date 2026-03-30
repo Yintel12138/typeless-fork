@@ -22,7 +22,9 @@ export default function Overlay() {
   const rafRef = useRef<number | null>(null);
   const phaseRef = useRef<Phase>("idle");
 
-  phaseRef.current = phase;
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   // ── RMS polling loop ────────────────────────────────────────────────────────
 

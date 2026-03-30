@@ -1,6 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 
+// ─── Hotkey code mapping ───────────────────────────────────────────────────────
+
+/**
+ * Maps a browser `KeyboardEvent.code` value to the string expected by the
+ * Rust rdev hotkey parser.  Handles letter keys ("KeyA" → "A"), digit keys
+ * ("Digit1" → "Num1"), modifier keys ("ControlRight" → "RightCtrl"), and
+ * function keys ("F13" → "F13").  Falls back to the raw code if no specific
+ * mapping exists.
+ */
+function mapKeyCode(code: string): string {
+  // Letter keys: "KeyA" → "A"
+  if (/^Key[A-Z]$/.test(code)) return code.slice(3);
+  // Digit keys: "Digit1" → "Num1"
+  if (/^Digit\d$/.test(code)) return `Num${code.slice(5)}`;
+  // Modifiers
+  const modMap: Record<string, string> = {
+    ControlLeft: "ControlLeft",
+    ControlRight: "RightCtrl",
+    ShiftLeft: "ShiftLeft",
+    ShiftRight: "ShiftRight",
+    AltLeft: "Alt",
+    AltRight: "AltGr",
+    MetaLeft: "MetaLeft",
+    MetaRight: "MetaRight",
+  };
+  if (code in modMap) return modMap[code];
+  // Function keys and other named keys are used as-is (e.g. "F13", "Escape")
+  return code;
+}
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 interface SpeechApiConfig {
@@ -130,7 +160,8 @@ export default function Settings() {
     if (!recording) return;
     const handler = (e: KeyboardEvent) => {
       e.preventDefault();
-      const keyName = e.code.replace("Key", "").replace("Digit", "");
+      // Map e.code to the key name expected by the Rust hotkey manager
+      const keyName = mapKeyCode(e.code);
       update("hotkey", keyName);
       setRecording(false);
       setStatus("");
